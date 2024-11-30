@@ -1,0 +1,5 @@
+ALTER TABLE schools ADD level varchar(255) DEFAULT NULL;
+ALTER TABLE classrooms ADD level varchar(255) DEFAULT NULL;
+
+ALTER TABLE schools ADD admin_id bigint DEFAULT NULL REFERENCES users ON DELETE SET NULL;
+ALTER TABLE schools ADD specialist_id bigint DEFAULT NULL REFERENCES users ON DELETE SET NULL;

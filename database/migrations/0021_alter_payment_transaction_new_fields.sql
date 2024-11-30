@@ -1,0 +1,13 @@
+ALTER TABLE payment_transactions ADD COLUMN unit_price float DEFAULT NULL;
+ALTER TABLE payment_transactions ADD COLUMN school_price float DEFAULT NULL;
+ALTER TABLE payment_transactions ADD COLUMN center_price float DEFAULT NULL;
+ALTER TABLE payment_transactions ADD COLUMN discount_price float DEFAULT NULL;
+ALTER TABLE payment_transactions ADD COLUMN used_days float DEFAULT NULL;
+ALTER TABLE payment_transactions ADD COLUMN used_days_price float DEFAULT NULL;
+ALTER TABLE payment_transactions ADD COLUMN school_months int DEFAULT 0;
+ALTER TABLE payment_transactions ADD COLUMN center_months int DEFAULT 0;
+ALTER TABLE payment_transactions ADD COLUMN school_months int DEFAULT 0;
+ALTER TABLE payment_transactions ADD COLUMN school_classroom_uids uuid[];
+ALTER TABLE payment_transactions ADD COLUMN center_classroom_uids uuid[];
+ALTER TABLE payment_transactions DROP COLUMN classroom_uids;
+ALTER TABLE payment_transactions DROP COLUMN month;

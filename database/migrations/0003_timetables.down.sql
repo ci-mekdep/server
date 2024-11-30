@@ -1,0 +1,6 @@
+DROP TABLE IF EXISTS student_notes;
+DROP TABLE IF EXISTS timetables;
+DROP TABLE IF EXISTS period_grades;
+DROP TABLE IF EXISTS user_logs;
+DROP TABLE IF EXISTS subject_exams;
+DROP TABLE IF EXISTS subjects;

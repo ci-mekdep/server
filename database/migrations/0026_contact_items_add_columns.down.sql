@@ -1,0 +1,1 @@
+ALTER TABLE contact_items DROP COLUMN note;

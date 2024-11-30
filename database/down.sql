@@ -1,0 +1,9 @@
+\i database/migrations/0006_messages.down.sql
+\i database/migrations/0005_payments.down.sql
+\i database/migrations/0004_lessons.down.sql
+\i database/migrations/0003_timetables.down.sql
+\i database/migrations/0002_schools.down.sql
+\i database/migrations/0001_users.down.sql
+\i database/migrations/0007_reports.down.sql
+\i database/migrations/0022_settings.down.sql
+\i database/migrations/0029_user_payments.down.sql

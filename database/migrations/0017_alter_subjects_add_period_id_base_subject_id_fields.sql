@@ -1,0 +1,3 @@
+ALTER TABLE subjects ADD period_id bigint DEFAULT NULL REFERENCES periods ON DELETE SET NULL;
+ALTER TABLE subjects ADD base_subject_id bigint DEFAULT NULL REFERENCES base_subjects ON DELETE SET NULL;
+ALTER TABLE classrooms ADD shift_id bigint DEFAULT NULL REFERENCES shifts ON DELETE SET NULL;

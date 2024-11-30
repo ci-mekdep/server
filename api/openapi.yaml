@@ -1,0 +1,5256 @@
+openapi: 3.0.1
+info:
+  title: eMekdep API
+  description: ''
+  version: 1.0.0
+tags:
+  - name: App
+  - name: Journal
+  - name: Core
+  - name: School
+  - name: Classroom
+  - name: Diary
+  - name: Reports
+  - name: Payments
+paths:
+  /users/login:
+    post:
+      summary: /users/login
+      deprecated: false
+      description: ''
+      tags:
+        - App
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                login:
+                  type: string
+                  examples:
+                    - '62712204'
+                password:
+                  type: string
+                  examples:
+                    - password
+                  nullable: true
+                otp:
+                  type: string
+                  examples:
+                    - '13321'
+                  nullable: true
+                school_id:
+                  oneOf:
+                    - &ref_0
+                      $ref: '#/components/schemas/Id'
+                    - type: 'null'
+                roles_priority:
+                  type: array
+                  items:
+                    type: string
+                  examples:
+                    - - admin
+                      - organization
+                      - principal
+                      - teacher
+                      - parent
+                      - student
+              type: object
+            example: ''
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                properties:
+                  token:
+                    type: string
+                    examples:
+                      - ABClongString
+                  expires_at: &ref_4
+                    $ref: '#/components/schemas/DateTime'
+                  user: &ref_2
+                    $ref: '#/components/schemas/User'
+                type: object
+      security: []
+  /users/sessions:
+    delete:
+      summary: /users/sessions
+      deprecated: false
+      description: ''
+      tags:
+        - App
+      parameters:
+        - name: ids
+          in: query
+          description: Id for session
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+      security: []
+    get:
+      summary: /users/sessions
+      deprecated: false
+      description: ''
+      tags:
+        - App
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                properties:
+                  sessions:
+                    type: array
+                    items: &ref_45
+                      $ref: '#/components/schemas/Session'
+                type: object
+      security: []
+  /users/me:
+    get:
+      summary: /users/me
+      deprecated: false
+      description: ''
+      tags:
+        - App
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                properties:
+                  current_role: &ref_1
+                    $ref: '#/components/schemas/RoleCode'
+                  current_school: *ref_0
+                  edit_fields:
+                    type: array
+                    items:
+                      type: string
+                  user:
+                    allOf:
+                      - &ref_9
+                        $ref: '#/components/schemas/UserList'
+                      - properties:
+                          schools:
+                            type: array
+                            items: &ref_57
+                              $ref: '#/components/schemas/UserSchool'
+                        type: object
+                type: object
+      security: []
+    patch:
+      summary: /users/me
+      deprecated: false
+      description: ''
+      tags:
+        - App
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - properties:
+                    current_role: *ref_1
+                    current_school: *ref_0
+                  type: object
+                - $ref: '#/components/schemas/UserProfileEdit'
+            example: ''
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                properties:
+                  user: *ref_2
+                type: object
+      security: []
+  /users/security:
+    post:
+      summary: /users/security
+      deprecated: false
+      description: ''
+      tags:
+        - App
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserPassword'
+            example: ''
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: &ref_5
+                $ref: '#/components/schemas/SuccessResponse'
+      security: []
+  /messages:
+    get:
+      summary: /messages
+      deprecated: false
+      description: ''
+      tags:
+        - App
+      parameters:
+        - name: classroom_id
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                properties:
+                  group:
+                    $ref: '#/components/schemas/MessageGroup'
+                  messages:
+                    type: array
+                    items: &ref_3
+                      $ref: '#/components/schemas/Message'
+                type: object
+      security: []
+    post:
+      summary: /messages
+      deprecated: false
+      description: ''
+      tags:
+        - App
+      parameters:
+        - name: classroom_id
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessageCreate'
+            example: ''
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                properties:
+                  message: *ref_3
+                type: object
+      security: []
+  /users/logs:
+    get:
+      summary: /users/logs
+      deprecated: false
+      description: ''
+      tags:
+        - App
+      parameters:
+        - name: date_range
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: array
+            items: *ref_4
+        - name: school_id
+          in: query
+          description: ''
+          required: false
+          schema: *ref_0
+        - name: user_id
+          in: query
+          description: ''
+          required: false
+          schema: *ref_0
+        - name: session_id
+          in: query
+          description: ''
+          required: false
+          schema: *ref_0
+        - name: subject_id
+          in: query
+          description: ''
+          required: false
+          schema: *ref_0
+        - name: subject_name
+          in: query
+          description: ''
+          required: false
+          schema: &ref_46
+            $ref: '#/components/schemas/UserLogSubject'
+        - name: subject_action
+          in: query
+          description: ''
+          required: false
+          schema: &ref_47
+            $ref: '#/components/schemas/UserLogAction'
+        - name: ip
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      items:
+                        $ref: '#/components/schemas/UserLog'
+                    type: object
+      security: []
+  /users/notifications:
+    get:
+      summary: /users/notifications
+      deprecated: false
+      description: ''
+      tags:
+        - App
+      parameters:
+        - name: user_id
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: integer
+        - name: id[]
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: integer
+        - name: read
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      total:
+                        type: integer
+                      total_unread:
+                        type: integer
+                      items:
+                        type: array
+                        items: &ref_6
+                          $ref: '#/components/schemas/UserNotification'
+                    type: object
+      security: []
+  /users/notifications/{id}:
+    put:
+      summary: /users/notifications/{id}
+      deprecated: false
+      description: ''
+      tags:
+        - App
+      parameters:
+        - name: id
+          in: path
+          description: ''
+          required: true
+          example: ''
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserNotificationCreate'
+            example: ''
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      item: *ref_6
+                    type: object
+      security: []
+  /users/notifications/sender:
+    get:
+      summary: /users/notifications/sender
+      deprecated: false
+      description: ''
+      tags:
+        - App
+      parameters:
+        - name: user_id
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      items:
+                        type: array
+                        items: &ref_7
+                          $ref: '#/components/schemas/Notification'
+                    type: object
+      security: []
+    post:
+      summary: /users/notifications/sender
+      deprecated: false
+      description: ''
+      tags:
+        - App
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema: &ref_8
+              $ref: '#/components/schemas/NotificationCreate'
+            example: ''
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      item: *ref_7
+                    type: object
+      security: []
+  /users/notifications/sender/{id}:
+    put:
+      summary: /users/notifications/sender/{id}
+      deprecated: false
+      description: ''
+      tags:
+        - App
+      parameters:
+        - name: id
+          in: path
+          description: ''
+          required: true
+          example: ''
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema: *ref_8
+            example: ''
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      item: *ref_7
+                    type: object
+      security: []
+  /lesson/like/{id}:
+    post:
+      summary: /lesson/like/{id}
+      deprecated: false
+      description: ''
+      tags:
+        - Journal
+      parameters:
+        - name: id
+          in: path
+          description: ''
+          required: true
+          example: ''
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LessonLikesRequest'
+            example: ''
+      responses:
+        '200':
+          description: Successfully created a lesson like
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+      security: []
+  /lessons/journal:
+    get:
+      summary: /lessons/journal
+      deprecated: false
+      description: ''
+      tags:
+        - Journal
+      parameters:
+        - name: date
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: string
+        - name: subject_id
+          in: query
+          description: ''
+          required: true
+          schema:
+            type: string
+        - name: period_number
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      data:
+                        $ref: '#/components/schemas/Journal'
+                    type: object
+      security: []
+  /lessons:
+    post:
+      summary: /lessons
+      deprecated: false
+      description: ''
+      tags:
+        - Journal
+      parameters: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  examples:
+                    - Homework Big Text...
+                  example: Homework Big Text...
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                files_delete:
+                  type: array
+                  items: &ref_38
+                    $ref: '#/components/schemas/FileDelete'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      lesson: &ref_55
+                        $ref: '#/components/schemas/Lesson'
+                      grade: &ref_10
+                        $ref: '#/components/schemas/Grade'
+                      absent: &ref_56
+                        $ref: '#/components/schemas/Absent'
+                    type: object
+      security: []
+  /lessons/final:
+    get:
+      summary: /lessons/final
+      deprecated: false
+      description: ''
+      tags:
+        - Journal
+      parameters:
+        - name: subject_id
+          in: query
+          description: ''
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                properties:
+                  students:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        student: *ref_9
+                        periods:
+                          type: object
+                          properties:
+                            '1': *ref_10
+                        exam: *ref_10
+                        final: *ref_10
+                type: object
+      security: []
+    post:
+      summary: /lessons/final
+      deprecated: false
+      description: ''
+      tags:
+        - Journal
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - &ref_37
+                  $ref: '#/components/schemas/GradeCreate'
+                - properties:
+                    subject_id: *ref_0
+                  type: object
+            example: ''
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      grade: *ref_10
+                    type: object
+      security: []
+  /teacher/timetable:
+    get:
+      summary: /teacher/timetable
+      deprecated: false
+      description: ''
+      tags:
+        - Journal
+      parameters:
+        - name: date
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - $ref: '#/components/schemas/TeacherTimetable'
+      security: []
+  /public/schools:
+    get:
+      summary: /public/schools
+      deprecated: false
+      description: ''
+      tags:
+        - Core
+      parameters:
+        - name: parent_id
+          in: query
+          description: When passed fetches children of regions
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                properties:
+                  schools:
+                    type: array
+                    items: &ref_14
+                      $ref: '#/components/schemas/School'
+                type: object
+      security: []
+  /public/regions:
+    get:
+      summary: /public/regions
+      deprecated: false
+      description: ''
+      tags:
+        - Core
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                properties:
+                  regions:
+                    type: object
+                    examples:
+                      - Aşgabat şäheri: []
+                    properties: {}
+                type: object
+              examples:
+                '1':
+                  summary: Success
+                  value:
+                    regions:
+                      Ahal welaýaty:
+                        - id: 368
+                          code: akb
+                          name: Ak bugdaý etraby
+                          full_name: Ak bugdaý etraby
+                          description: null
+                          address: null
+                          avatar: null
+                          background: null
+                          phone: null
+                          email: null
+                          level: null
+                          galleries: null
+                          latitude: null
+                          longitude: null
+                          is_digitalized: null
+                          updated_at: '2001-01-01T01:01:01Z'
+                          created_at: '2001-01-01T01:01:01Z'
+                          archived_at: null
+                          timetables_count: 0
+                          classrooms_count: 0
+                          parent: null
+                          admin: null
+                          specialist: null
+                        - id: 375
+                          code: bbd
+                          name: Babadaýhan etraby
+                          full_name: Babadaýhan etraby
+                          description: null
+                          address: null
+                          avatar: null
+                          background: null
+                          phone: null
+                          email: null
+                          level: null
+                          galleries: null
+                          latitude: null
+                          longitude: null
+                          is_digitalized: null
+                          updated_at: '2001-01-01T01:01:01Z'
+                          created_at: '2001-01-01T01:01:01Z'
+                          archived_at: null
+                          timetables_count: 0
+                          classrooms_count: 0
+                          parent: null
+                          admin: null
+                          specialist: null
+                        - id: 369
+                          code: bhr
+                          name: Bäherden etraby
+                          full_name: Bäherden etraby
+                          description: null
+                          address: null
+                          avatar: null
+                          background: null
+                          phone: null
+                          email: null
+                          level: null
+                          galleries: null
+                          latitude: null
+                          longitude: null
+                          is_digitalized: null
+                          updated_at: '2001-01-01T01:01:01Z'
+                          created_at: '2001-01-01T01:01:01Z'
+                          archived_at: null
+                          timetables_count: 0
+                          classrooms_count: 0
+                          parent: null
+                          admin: null
+                          specialist: null
+                        - id: 370
+                          code: gkd
+                          name: Gökdepe etraby
+                          full_name: Gökdepe etraby
+                          description: null
+                          address: null
+                          avatar: null
+                          background: null
+                          phone: null
+                          email: null
+                          level: null
+                          galleries: null
+                          latitude: null
+                          longitude: null
+                          is_digitalized: null
+                          updated_at: '2001-01-01T01:01:01Z'
+                          created_at: '2001-01-01T01:01:01Z'
+                          archived_at: null
+                          timetables_count: 0
+                          classrooms_count: 0
+                          parent: null
+                          admin: null
+                          specialist: null
+                        - id: 372
+                          code: kka
+                          name: Kaka şäheri
+                          full_name: Kaka şäheri
+                          description: null
+                          address: null
+                          avatar: null
+                          background: null
+                          phone: null
+                          email: null
+                          level: null
+                          galleries: null
+                          latitude: null
+                          longitude: null
+                          is_digitalized: null
+                          updated_at: '2001-01-01T01:01:01Z'
+                          created_at: '2001-01-01T01:01:01Z'
+                          archived_at: null
+                          timetables_count: 0
+                          classrooms_count: 0
+                          parent: null
+                          admin: null
+                          specialist: null
+                      Arkadag:
+                        - id: 376
+                          code: ark
+                          name: Arkadag şäheri
+                          full_name: Arkadag şäheri
+                          description: null
+                          address: null
+                          avatar: null
+                          background: null
+                          phone: null
+                          email: null
+                          level: null
+                          galleries: null
+                          latitude: null
+                          longitude: null
+                          is_digitalized: null
+                          updated_at: '2001-01-01T01:01:01Z'
+                          created_at: '2001-01-01T01:01:01Z'
+                          archived_at: null
+                          timetables_count: 0
+                          classrooms_count: 0
+                          parent: null
+                          admin: null
+                          specialist: null
+                      Aşgabat:
+                        - id: 362
+                          code: ag
+                          name: Aşgabat şäheri
+                          full_name: Aşgabat şäheri
+                          description: null
+                          address: null
+                          avatar: null
+                          background: null
+                          phone: null
+                          email: null
+                          level: null
+                          galleries: null
+                          latitude: null
+                          longitude: null
+                          is_digitalized: null
+                          updated_at: '2001-01-01T01:01:01Z'
+                          created_at: '2001-01-01T01:01:01Z'
+                          archived_at: null
+                          timetables_count: 0
+                          classrooms_count: 0
+                          parent: null
+                          admin: null
+                          specialist: null
+                      Balkan welaýaty: []
+                      Daşoguz welaýaty: []
+                      Lebap welaýaty: []
+                      Mary welaýaty: []
+                    success: true
+                    total: 15
+      security: []
+  /topics:
+    get:
+      summary: /topics
+      deprecated: false
+      description: ''
+      tags:
+        - Core
+      parameters:
+        - name: search
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: string
+        - name: sort
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: string
+        - name: classroom
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: integer
+        - name: subject
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: string
+        - name: level
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: string
+        - name: period
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      data:
+                        type: object
+                        properties:
+                          topics:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/TopicList'
+                    type: object
+      security: []
+  /settings:
+    get:
+      summary: /settings
+      deprecated: true
+      description: ''
+      tags:
+        - Core
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      settings: &ref_34
+                        $ref: '#/components/schemas/AppSettings'
+                    type: object
+      security: []
+  /settings/pages:
+    get:
+      summary: /settings/pages
+      deprecated: false
+      description: ''
+      tags:
+        - Core
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      settings: &ref_43
+                        $ref: '#/components/schemas/AppSettingsPages'
+                    type: object
+      security: []
+  /settings/contact:
+    get:
+      summary: /settings/contact
+      deprecated: false
+      description: ''
+      tags:
+        - Core
+      parameters:
+        - name: role
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      settings:
+                        $ref: '#/components/schemas/AppSettingsContact'
+                    type: object
+      security: []
+  /settings/subject:
+    get:
+      summary: /settings/subject
+      deprecated: false
+      description: ''
+      tags:
+        - Core
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      settings:
+                        $ref: '#/components/schemas/AppSettingsSubject'
+                    type: object
+      security: []
+  /permissions:
+    get:
+      summary: /permissions
+      deprecated: false
+      description: ''
+      tags:
+        - Core
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      permissions:
+                        type: array
+                        items: &ref_11
+                          $ref: '#/components/schemas/AppPermission'
+                        examples:
+                          - - users
+                            - tool_logs
+                      permissions_write:
+                        type: array
+                        items: *ref_11
+                        examples:
+                          - - users
+                    type: object
+      security: []
+  /dashboards:
+    get:
+      summary: /dashboards
+      deprecated: false
+      description: ''
+      tags:
+        - Core
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      dashboards: &ref_12
+                        $ref: '#/components/schemas/Dashboard'
+                    type: object
+      security: []
+  /dashboards/details:
+    get:
+      summary: /dashboards/details
+      deprecated: false
+      description: ''
+      tags:
+        - Core
+      parameters:
+        - name: date
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      dashboards: *ref_12
+                    type: object
+      security: []
+  /users:
+    get:
+      summary: /users
+      deprecated: false
+      description: ''
+      tags:
+        - School
+      parameters:
+        - name: role
+          in: query
+          description: ''
+          required: false
+          schema: *ref_1
+        - name: roles[]
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: array
+            items: *ref_1
+        - name: gender
+          in: query
+          description: ''
+          required: false
+          schema: &ref_41
+            $ref: '#/components/schemas/Gender'
+        - name: birthday
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: string
+        - name: address
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: ''
+          required: false
+          schema: &ref_40
+            $ref: '#/components/schemas/Status'
+        - name: lesson_hours
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: array
+            items:
+              type: integer
+        - name: parents_count
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: integer
+        - name: children_count
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: integer
+        - name: search
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: string
+        - name: sort
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: string
+            enum:
+              - id
+              - first_name
+              - last_name
+              - middle_name
+              - username
+              - phone
+              - status
+              - school_id
+              - birthday
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      users:
+                        type: array
+                        items: *ref_2
+                    type: object
+      security: []
+    delete:
+      summary: /users
+      deprecated: false
+      description: ''
+      tags:
+        - School
+      parameters:
+        - name: ids
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: array
+            items:
+              type: integer
+        - name: idroles
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+              examples:
+                - 1212,student
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      data:
+                        type: object
+                        properties:
+                          item: *ref_2
+                    type: object
+      security: []
+    post:
+      summary: /users
+      deprecated: false
+      description: ''
+      tags:
+        - School
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema: &ref_13
+              $ref: '#/components/schemas/UserCreate'
+            example: ''
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      data:
+                        type: object
+                        properties:
+                          item: *ref_2
+                    type: object
+      security: []
+  /users/{id}:
+    put:
+      summary: /users/{id}
+      deprecated: false
+      description: ''
+      tags:
+        - School
+      parameters:
+        - name: id
+          in: path
+          description: ''
+          required: true
+          example: ''
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema: *ref_13
+            example: ''
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      data:
+                        type: object
+                        properties:
+                          item: *ref_2
+                    type: object
+      security: []
+  /schools:
+    get:
+      summary: /schools
+      deprecated: false
+      description: ''
+      tags:
+        - School
+      parameters:
+        - name: parent_id
+          in: query
+          description: When passed fetches children, otherwise only parents
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      data:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items: *ref_14
+                    type: object
+      security: []
+    delete:
+      summary: /schools
+      deprecated: false
+      description: ''
+      tags:
+        - School
+      parameters:
+        - name: ids
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: array
+            items:
+              type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      data:
+                        type: object
+                        properties:
+                          item: *ref_14
+                    type: object
+      security: []
+    post:
+      summary: /schools
+      deprecated: false
+      description: ''
+      tags:
+        - School
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema: &ref_15
+              $ref: '#/components/schemas/SchoolCreate'
+            example: ''
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      data:
+                        type: object
+                        properties:
+                          item: *ref_14
+                    type: object
+      security: []
+  /schools/{id}:
+    put:
+      summary: /schools/{id}
+      deprecated: false
+      description: ''
+      tags:
+        - School
+      parameters:
+        - name: id
+          in: path
+          description: ''
+          required: true
+          example: ''
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema: *ref_15
+            example: ''
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      data:
+                        type: object
+                        properties:
+                          item: *ref_14
+                    type: object
+      security: []
+  /periods:
+    get:
+      summary: /periods
+      deprecated: false
+      description: ''
+      tags:
+        - School
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      data:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items: &ref_16
+                              $ref: '#/components/schemas/Period'
+                    type: object
+      security: []
+    post:
+      summary: /periods
+      deprecated: false
+      description: ''
+      tags:
+        - School
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema: &ref_17
+              $ref: '#/components/schemas/PeriodCreate'
+            example: ''
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      data:
+                        type: object
+                        properties:
+                          item: *ref_16
+                    type: object
+      security: []
+  /periods/{id}:
+    put:
+      summary: /periods/{id}
+      deprecated: false
+      description: ''
+      tags:
+        - School
+      parameters:
+        - name: id
+          in: path
+          description: ''
+          required: true
+          example: ''
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema: *ref_17
+            example: ''
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      data:
+                        type: object
+                        properties:
+                          item: *ref_16
+                    type: object
+      security: []
+    delete:
+      summary: /periods/{id}
+      deprecated: false
+      description: ''
+      tags:
+        - School
+      parameters:
+        - name: id
+          in: path
+          description: ''
+          required: true
+          example: ''
+          schema:
+            type: integer
+        - name: ids
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: array
+            items:
+              type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+      security: []
+  /contact-items:
+    get:
+      summary: /contact-items
+      deprecated: false
+      description: ''
+      tags:
+        - School
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      contact_items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ContactItemList'
+                    type: object
+      security: []
+    post:
+      summary: /contact-items
+      deprecated: false
+      description: ''
+      tags:
+        - School
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema: &ref_19
+              $ref: '#/components/schemas/ContactItemCreate'
+            example: ''
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      data:
+                        type: object
+                        properties:
+                          item: &ref_18
+                            $ref: '#/components/schemas/ContactItem'
+                    type: object
+      security: []
+    delete:
+      summary: /contact-items
+      deprecated: false
+      description: ''
+      tags:
+        - School
+      parameters:
+        - name: ids
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: array
+            items:
+              type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      data:
+                        type: object
+                        properties:
+                          classrooms:
+                            type: array
+                            items: *ref_18
+                    type: object
+      security: []
+  /contact-items/{id}:
+    put:
+      summary: /contact-items/{id}
+      deprecated: false
+      description: ''
+      tags:
+        - School
+      parameters:
+        - name: id
+          in: path
+          description: ''
+          required: true
+          example: ''
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema: *ref_19
+            example: ''
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      data:
+                        type: object
+                        properties:
+                          item: *ref_18
+                    type: object
+      security: []
+  /classrooms:
+    get:
+      summary: /classrooms
+      deprecated: false
+      description: ''
+      tags:
+        - Classroom
+      parameters:
+        - name: search
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: string
+        - name: sort
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: string
+            enum:
+              - id
+              - name
+              - students
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      data:
+                        type: object
+                        properties:
+                          classrooms:
+                            type: array
+                            items: &ref_53
+                              $ref: '#/components/schemas/ClassroomList'
+                    type: object
+      security: []
+    post:
+      summary: /classrooms
+      deprecated: false
+      description: ''
+      tags:
+        - Classroom
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema: &ref_21
+              $ref: '#/components/schemas/ClassroomCreate'
+            example: ''
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      data:
+                        type: object
+                        properties:
+                          item: &ref_20
+                            $ref: '#/components/schemas/Classroom'
+                    type: object
+      security: []
+    delete:
+      summary: /classrooms
+      deprecated: false
+      description: ''
+      tags:
+        - Classroom
+      parameters:
+        - name: ids
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: array
+            items:
+              type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      data:
+                        type: object
+                        properties:
+                          classrooms:
+                            type: array
+                            items: *ref_20
+                    type: object
+      security: []
+  /classrooms/{id}:
+    put:
+      summary: /classrooms/{id}
+      deprecated: false
+      description: ''
+      tags:
+        - Classroom
+      parameters:
+        - name: id
+          in: path
+          description: ''
+          required: true
+          example: ''
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema: *ref_21
+            example: ''
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      data:
+                        type: object
+                        properties:
+                          item: *ref_20
+                    type: object
+      security: []
+  /subjects/exams:
+    get:
+      summary: /subjects/exams
+      deprecated: false
+      description: ''
+      tags:
+        - Classroom
+      parameters:
+        - name: subject_ids
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: array
+            items:
+              type: integer
+        - name: teacher_ids
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: array
+            items:
+              type: integer
+        - name: sort
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: string
+            enum:
+              - id
+              - subject_id
+              - teacher_id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      items:
+                        type: array
+                        items: &ref_22
+                          $ref: '#/components/schemas/SubjectExam'
+                    type: object
+      security: []
+    post:
+      summary: /subjects/exams
+      deprecated: false
+      description: ''
+      tags:
+        - Classroom
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema: &ref_23
+              $ref: '#/components/schemas/SubjectExamCreate'
+            example: ''
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      data:
+                        type: object
+                        properties:
+                          item: *ref_22
+                    type: object
+      security: []
+    delete:
+      summary: /subjects/exams
+      deprecated: false
+      description: ''
+      tags:
+        - Classroom
+      parameters:
+        - name: ids
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: array
+            items:
+              type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      data:
+                        type: object
+                        properties:
+                          subject_exams:
+                            type: array
+                            items: *ref_22
+                    type: object
+      security: []
+  /subjects/exam/{id}:
+    put:
+      summary: /subjects/exam/{id}
+      deprecated: false
+      description: ''
+      tags:
+        - Classroom
+      parameters:
+        - name: id
+          in: path
+          description: ''
+          required: true
+          example: ''
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema: *ref_23
+            example: ''
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      subject_exam: *ref_22
+                    type: object
+      security: []
+  /base-subjects:
+    post:
+      summary: /base-subjects
+      deprecated: false
+      description: ''
+      tags:
+        - Classroom
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              anyOf:
+                - $ref: '#/components/schemas/BaseSubjectRequest'
+                - type: 'null'
+            example: ''
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - &ref_24
+                    $ref: '#/components/schemas/BaseSubject'
+      security: []
+    get:
+      summary: /base-subjects
+      deprecated: false
+      description: ''
+      tags: []
+      parameters: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default: true
+                    readOnly: true
+                  base_subjects:
+                    type: array
+                    items: *ref_24
+                required:
+                  - base_subjects
+      security: []
+  /subjects:
+    get:
+      summary: /subjects
+      deprecated: false
+      description: ''
+      tags:
+        - Classroom
+      parameters:
+        - name: classroom_ids
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: array
+            items:
+              type: integer
+        - name: subject_names
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - name: teacher_ids
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: array
+            items:
+              type: integer
+        - name: is_second_teacher
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: boolean
+        - name: sort
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: string
+            enum:
+              - id
+              - classroom_id
+              - subject_id
+              - teacher_id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      data:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items: &ref_54
+                              $ref: '#/components/schemas/SubjectList'
+                    type: object
+      security: []
+    post:
+      summary: /subjects
+      deprecated: false
+      description: ''
+      tags:
+        - Classroom
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema: &ref_26
+              $ref: '#/components/schemas/SubjectCreate'
+            example: ''
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      data:
+                        type: object
+                        properties:
+                          item: &ref_25
+                            $ref: '#/components/schemas/Subject'
+                    type: object
+      security: []
+    delete:
+      summary: /subjects
+      deprecated: false
+      description: ''
+      tags:
+        - Classroom
+      parameters:
+        - name: ids
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: array
+            items:
+              type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      data:
+                        type: object
+                        properties:
+                          classrooms:
+                            type: array
+                            items: *ref_25
+                    type: object
+      security: []
+  /subjects/{id}:
+    put:
+      summary: /subjects/{id}
+      deprecated: false
+      description: ''
+      tags:
+        - Classroom
+      parameters:
+        - name: id
+          in: path
+          description: ''
+          required: true
+          example: ''
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema: *ref_26
+            example: ''
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      subject: *ref_25
+                    type: object
+      security: []
+  /timetables:
+    get:
+      summary: /timetables
+      deprecated: false
+      description: ''
+      tags:
+        - Classroom
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      timetables:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/TimetableList'
+                    type: object
+      security: []
+    post:
+      summary: /timetables
+      deprecated: false
+      description: ''
+      tags:
+        - Classroom
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema: &ref_28
+              $ref: '#/components/schemas/TimetableCreate'
+            example: ''
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      timetable: &ref_27
+                        $ref: '#/components/schemas/Timetable'
+                    type: object
+      security: []
+    delete:
+      summary: /timetables
+      deprecated: false
+      description: ''
+      tags:
+        - Classroom
+      parameters:
+        - name: ids
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: array
+            items:
+              type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      data:
+                        type: object
+                        properties:
+                          classrooms:
+                            type: array
+                            items: *ref_27
+                    type: object
+      security: []
+  /timetables/{id}:
+    put:
+      summary: /timetables/{id}
+      deprecated: false
+      description: ''
+      tags:
+        - Classroom
+      parameters:
+        - name: id
+          in: path
+          description: ''
+          required: true
+          example: ''
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema: *ref_28
+            example: ''
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      data:
+                        type: object
+                        properties:
+                          item: *ref_27
+                    type: object
+      security: []
+  /shifts:
+    get:
+      summary: /shifts
+      deprecated: false
+      description: ''
+      tags:
+        - Classroom
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      data:
+                        type: object
+                        properties:
+                          shifts:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/ShiftList'
+                    type: object
+      security: []
+    post:
+      summary: /shifts
+      deprecated: false
+      description: ''
+      tags:
+        - Classroom
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema: &ref_30
+              $ref: '#/components/schemas/ShiftCreate'
+            example: ''
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      data:
+                        type: object
+                        properties:
+                          item: &ref_29
+                            $ref: '#/components/schemas/Shift'
+                    type: object
+      security: []
+    delete:
+      summary: /shifts
+      deprecated: false
+      description: ''
+      tags:
+        - Classroom
+      parameters:
+        - name: ids
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: array
+            items:
+              type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      data:
+                        type: object
+                        properties:
+                          classrooms:
+                            type: array
+                            items: *ref_29
+                    type: object
+      security: []
+  /shifts/{id}:
+    put:
+      summary: /shifts/{id}
+      deprecated: false
+      description: ''
+      tags:
+        - Classroom
+      parameters:
+        - name: id
+          in: path
+          description: ''
+          required: true
+          example: ''
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema: *ref_30
+            example: ''
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      data:
+                        type: object
+                        properties:
+                          item: *ref_29
+                    type: object
+      security: []
+  /parent/diary:
+    get:
+      summary: /parent/diary
+      deprecated: false
+      description: ''
+      tags:
+        - Diary
+      parameters:
+        - name: date
+          in: query
+          description: ''
+          required: true
+          schema:
+            type: string
+        - name: child_id
+          in: query
+          description: ''
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      data:
+                        $ref: '#/components/schemas/Diary'
+                    type: object
+      security: []
+  /parent/children:
+    get:
+      summary: /parent/children
+      deprecated: false
+      description: ''
+      tags:
+        - Diary
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - $ref: '#/components/schemas/ParentChildren'
+      security: []
+  /parent/subjects:
+    get:
+      summary: /parent/subjects
+      deprecated: false
+      description: ''
+      tags:
+        - Diary
+      parameters:
+        - name: child_id
+          in: query
+          description: ''
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - $ref: '#/components/schemas/ParentSubjects'
+      security: []
+  /analytics/weekly:
+    get:
+      summary: /analytics/weekly
+      deprecated: false
+      description: ''
+      tags:
+        - Diary
+      parameters:
+        - name: date
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: string
+        - name: child_id
+          in: query
+          description: ''
+          required: false
+          schema: *ref_0
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/AnalyticsSubjectAreaItem'
+                  - *ref_5
+      security: []
+  /analytics/summary:
+    get:
+      summary: /analytics/summary
+      deprecated: false
+      description: ''
+      tags:
+        - Diary
+      parameters:
+        - name: date
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: string
+        - name: child_id
+          in: query
+          description: ''
+          required: false
+          schema: *ref_0
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      summary:
+                        allOf:
+                          - $ref: '#/components/schemas/AnalyticsStreak'
+                          - $ref: '#/components/schemas/AnalyticsSubjectRating'
+                          - $ref: '#/components/schemas/AnalyticsGradeCounts'
+                    type: object
+      security: []
+  /analytics/grades:
+    get:
+      summary: not implemented
+      deprecated: false
+      description: ''
+      tags:
+        - Diary
+      parameters:
+        - name: subject_id
+          in: query
+          description: ''
+          required: true
+          schema:
+            type: string
+        - name: period_number
+          in: query
+          description: ''
+          required: true
+          schema:
+            type: string
+        - name: child_id
+          in: query
+          description: ''
+          required: true
+          schema: *ref_0
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      grades:
+                        type: array
+                        items: *ref_10
+                    type: object
+      security: []
+  /reports/form:
+    get:
+      summary: /reports/form
+      deprecated: false
+      description: ''
+      tags:
+        - Reports
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      settings:
+                        type: array
+                        items: &ref_31
+                          $ref: '#/components/schemas/ReportForm'
+                    type: object
+      security: []
+    post:
+      summary: /reports/form
+      deprecated: false
+      description: ''
+      tags:
+        - Reports
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                settings:
+                  type: array
+                  items: *ref_31
+              type: object
+            example: ''
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      settings:
+                        type: array
+                        items: *ref_31
+                    type: object
+      security: []
+  /reports/form/options:
+    get:
+      summary: /reports/form/options
+      deprecated: false
+      description: ''
+      tags:
+        - Reports
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      options:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ReportFormOptionScheme'
+                    type: object
+      security: []
+  /reports/data:
+    get:
+      summary: /reports/data
+      deprecated: false
+      description: ''
+      tags:
+        - Reports
+      parameters:
+        - name: start_date
+          in: query
+          description: ''
+          required: true
+          schema:
+            type: string
+        - name: end_date
+          in: query
+          description: ''
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      report: &ref_32
+                        $ref: '#/components/schemas/ReportData'
+                    type: object
+      security: []
+  /reports/attendance:
+    get:
+      summary: /reports/attendance
+      deprecated: false
+      description: ''
+      tags:
+        - Reports
+      parameters:
+        - name: start_date
+          in: query
+          description: ''
+          required: true
+          schema:
+            type: string
+        - name: end_date
+          in: query
+          description: ''
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      report: *ref_32
+                    type: object
+      security: []
+  /reports/journals:
+    get:
+      summary: /reports/journals
+      deprecated: false
+      description: ''
+      tags:
+        - Reports
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      report: *ref_32
+                    type: object
+      security: []
+  /reports/period_finished:
+    get:
+      summary: /reports/period_finished
+      deprecated: false
+      description: ''
+      tags:
+        - Reports
+      parameters:
+        - name: period_number
+          in: query
+          description: ''
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      report: *ref_32
+                    type: object
+      security: []
+  /reports/parents:
+    get:
+      summary: /reports/parents
+      deprecated: false
+      description: ''
+      tags:
+        - Reports
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - properties:
+                      report: *ref_32
+                    type: object
+      security: []
+  /payment/history:
+    get:
+      summary: /payment/history
+      deprecated: false
+      description: ''
+      tags:
+        - Payments
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                properties:
+                  transactions:
+                    type: array
+                    items: &ref_33
+                      $ref: '#/components/schemas/PaymentTransaction'
+                type: object
+      security: []
+  /payment/checkout:
+    post:
+      summary: not implemented
+      deprecated: false
+      description: ''
+      tags:
+        - Payments
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentCheckout'
+            example: ''
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                properties:
+                  transaction: *ref_33
+                type: object
+      security: []
+  /settings/v2:
+    get:
+      summary: /settings/v2
+      deprecated: false
+      description: ''
+      tags:
+        - Core
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_5
+                  - type: object
+                    properties:
+                      settings: *ref_34
+                    required:
+                      - settings
+      security: []
+components:
+  schemas:
+    AppSettingsPayments:
+      properties:
+        payment_map:
+          type: object
+          properties:
+            plus:
+              properties:
+                month_types:
+                  type: array
+                  items:
+                    type: integer
+                  examples:
+                    - - 1
+                      - 3
+                      - 9
+                code:
+                  $ref: '#/components/schemas/AccountStatus'
+                price: &ref_35
+                  $ref: '#/components/schemas/Money'
+                month_prices:
+                  type: object
+                  examples:
+                    - '9': '3600'
+                  properties: {}
+              type: object
+      type: object
+    BaseSubjectRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          faker: name.jobTitle
+        category:
+          type: string
+          description: options are inapi settings
+          enum:
+            - english
+            - computer
+            - german
+        age_category:
+          type: string
+          enum:
+            - adult
+            - kid
+        is_available:
+          type: boolean
+          description: status
+        exam_min_grade:
+          type: integer
+          description: max 100 min 0
+        price: *ref_35
+      required:
+        - title
+        - category
+        - is_available
+    SuccessResponse:
+      properties:
+        success:
+          type: boolean
+          default: true
+          readOnly: true
+      type: object
+    ServerErrorResponse:
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              examples:
+                - error
+            key:
+              type: string
+              examples:
+                - server
+            comment:
+              type: string
+              examples:
+                - please contact support
+        success:
+          type: boolean
+          default: false
+          readOnly: true
+      type: object
+    ErrorResponse:
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              $ref: '#/components/schemas/AppErrorCode'
+            key:
+              type: string
+              examples:
+                - username
+            comment:
+              type: string
+              examples:
+                - please fill all input
+        success:
+          type: boolean
+          default: false
+          readOnly: true
+      type: object
+    AppErrorCode:
+      type: string
+      enum:
+        - invalid
+        - required
+        - not_set
+        - not_exists
+        - unique
+        - expired
+        - not_found
+        - not_paid
+        - unauthorized
+        - forbidden
+    UserNotificationCreate:
+      properties:
+        comment:
+          type: string
+        comment_files:
+          type: array
+          items: &ref_36
+            $ref: '#/components/schemas/File'
+        comment_files_delete:
+          type: array
+          items: *ref_36
+      type: object
+    ContactItemCreate:
+      properties:
+        id: *ref_0
+        related_ids:
+          type: array
+          items: *ref_0
+        message:
+          type: string
+        type: &ref_48
+          $ref: '#/components/schemas/ContactItemType'
+        status: &ref_49
+          $ref: '#/components/schemas/ContactItemStatus'
+        files:
+          type: array
+          items: *ref_36
+      type: object
+    NotificationCreate:
+      properties:
+        school_ids:
+          description: create_only
+          type: array
+          items:
+            type: integer
+        user_ids:
+          description: create_only
+          type: array
+          items: *ref_0
+        roles:
+          type: array
+          items:
+            type: string
+        title:
+          type: string
+        content:
+          type: string
+        files:
+          type: array
+          items: *ref_36
+        files_delete:
+          type: array
+          items: *ref_36
+      type: object
+    PaymentConfirm:
+      properties:
+        code:
+          type: integer
+          examples:
+            - 1010
+        transaction_id:
+          type: string
+          examples:
+            - '1234'
+      type: object
+    PaymentCheckout:
+      properties:
+        student_ids:
+          type: array
+          items: *ref_0
+        months:
+          type: integer
+          examples:
+            - 3
+        tariff_status:
+          type: string
+          examples:
+            - plus
+        bank_type:
+          type: string
+          examples:
+            - halkbank
+      type: object
+    UserClassroomCreate:
+      properties:
+        type: &ref_39
+          $ref: '#/components/schemas/ClassroomType'
+        type_key:
+          type: integer
+          examples:
+            - 1
+        classroom_id: *ref_0
+      type: object
+    UserSchoolCreate:
+      properties:
+        role_code: *ref_1
+        school_id: *ref_0
+      type: object
+    SchoolCreate:
+      properties:
+        code:
+          type: string
+          examples:
+            - ag1
+        name:
+          type: string
+          examples:
+            - 1-nji orta mekdep
+        full_name:
+          type: string
+          examples:
+            - ''
+        description:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+        address:
+          type: string
+        avatar:
+          type: string
+          nullable: true
+        background:
+          type: string
+          nullable: true
+        admin_id:
+          type: string
+          nullable: true
+        parent_id:
+          type: string
+          nullable: true
+        is_secondary_school:
+          type: boolean
+      type: object
+    PeriodCreate:
+      properties:
+        title:
+          type: string
+          examples:
+            - 2022/23
+        value:
+          type: object
+          examples:
+            - - - '2023-09-01'
+                - '2023-10-22'
+              - - '2023-10-31'
+                - '2023-12-29'
+              - - '2024-01-12'
+                - '2024-03-19'
+              - - '2024-03-29'
+                - '2024-05-25'
+          properties: {}
+        is_enabled:
+          type: boolean
+        school_id: *ref_0
+      type: object
+    ShiftCreate:
+      properties:
+        school_id: *ref_0
+        name:
+          type: string
+          examples:
+            - 08:30/14:00 irdenki
+        value:
+          type: object
+          examples:
+            - - - - '08:30'
+                  - '09:15'
+                - - '09:20'
+                  - '10:05'
+                - - '10:10'
+                  - '10:55'
+                - - '11:10'
+                  - '11:55'
+              - null
+              - - - '08:30'
+                  - '09:15'
+                - - '09:20'
+                  - '10:05'
+                - - '10:10'
+                  - '10:55'
+                - - '11:10'
+                  - '11:55'
+              - null
+              - - - '08:30'
+                  - '09:15'
+                - - '09:20'
+                  - '10:05'
+                - - '10:10'
+                  - '10:55'
+                - - '11:10'
+                  - '11:55'
+              - null
+          properties: {}
+      type: object
+    TimetableCreate:
+      properties:
+        value:
+          type: object
+          examples:
+            - - - 12
+                - 13
+                - 14
+              - null
+              - - 12
+                - null
+                - 22
+                - 23
+                - 23
+              - null
+              - - 1
+                - 2
+                - 3
+              - null
+          properties: {}
+        this_week:
+          type: boolean
+        shift_id: *ref_0
+        classroom_id: *ref_0
+        school_id: *ref_0
+      type: object
+    JournalCreate:
+      properties:
+        lesson:
+          $ref: '#/components/schemas/LessonCreate'
+        assignment:
+          $ref: '#/components/schemas/AssignmentCreate'
+        lesson_pro:
+          $ref: '#/components/schemas/LessonProCreate'
+        grade: *ref_37
+        absent:
+          $ref: '#/components/schemas/AbsentCreate'
+        student_note:
+          $ref: '#/components/schemas/StudentNoteCreate'
+      type: object
+    LessonProCreate:
+      properties:
+        title:
+          type: string
+          examples:
+            - Text here goes...
+        files:
+          type: array
+          items:
+            type: string
+            format: binary
+        files_delete:
+          type: array
+          items: *ref_38
+      type: object
+    AssignmentCreate:
+      properties:
+        title:
+          type: string
+          examples:
+            - Homework Big Text...
+        files:
+          type: array
+          items:
+            type: string
+            format: binary
+        files_delete:
+          type: array
+          items: *ref_38
+      type: object
+    StudentNoteCreate:
+      properties:
+        student_id: *ref_0
+        note:
+          type: string
+      type: object
+    AbsentCreate:
+      properties:
+        reason:
+          type: string
+          examples:
+            - 'yes'
+        comment:
+          type: string
+      type: object
+    GradeCreate:
+      properties:
+        student_id: *ref_0
+        student_ids:
+          type: array
+          items: *ref_0
+        value:
+          type: integer
+          examples:
+            - 5
+        values:
+          type: array
+          items:
+            type: integer
+          examples:
+            - - 5
+              - 2
+        comment:
+          type: string
+      type: object
+    LessonCreate:
+      properties:
+        subject_id:
+          oneOf:
+            - *ref_0
+            - type: 'null'
+        title:
+          type: string
+          examples:
+            - Tema1
+        type_title:
+          type: string
+          examples:
+            - Amaly sapak
+        content:
+          type: string
+          examples:
+            - Tema Big Text...
+        date:
+          type: string
+          examples:
+            - '2023-10-18'
+          nullable: true
+        hour_number:
+          type: integer
+          examples:
+            - 2
+          nullable: true
+      type: object
+    SubjectExamCreate:
+      properties:
+        teacher_id: *ref_0
+        head_teacher_id: *ref_0
+        member_teacher_ids:
+          type: array
+          items: *ref_0
+        start_time: *ref_4
+        time_length_min:
+          type: integer
+        room_number:
+          type: string
+      type: object
+    SubjectCreate:
+      properties:
+        id: *ref_0
+        name:
+          type: string
+          examples:
+            - Matematika
+        full_name:
+          type: string
+          examples:
+            - Matematika baslangyc
+        week_hours:
+          type: integer
+          examples:
+            - 5
+        classroom_id: *ref_0
+        classroom_type: *ref_39
+        classroom_type_key:
+          type: integer
+          examples:
+            - 1
+        teacher_id: *ref_0
+        second_teacher_id: *ref_0
+        school_id: *ref_0
+        exam: *ref_23
+      type: object
+    ClassroomCreate:
+      properties:
+        name:
+          type: string
+          examples:
+            - 11A
+        student_ids:
+          type: array
+          items: *ref_0
+        subject_ids:
+          type: array
+          items: *ref_0
+        teacher_id: *ref_0
+        student_id: *ref_0
+        school_id: *ref_0
+        sub_groups: *ref_0
+      type: object
+    UserCreate:
+      properties:
+        first_name:
+          type: string
+          examples:
+            - Aman
+        last_name:
+          type: string
+          examples:
+            - Myradov
+          nullable: true
+        middle_name:
+          type: string
+          examples:
+            - Meredovich
+          nullable: true
+        status: *ref_40
+        username:
+          type: string
+          examples:
+            - aman
+        birthday: &ref_42
+          $ref: '#/components/schemas/Date'
+        gender:
+          oneOf:
+            - *ref_41
+            - type: 'null'
+        phone:
+          type: string
+          examples:
+            - '62121314'
+          nullable: true
+        email:
+          type: string
+          examples:
+            - aman@gmail.com
+          nullable: true
+        password:
+          type: string
+          examples:
+            - '12345678'
+          nullable: true
+        address:
+          type: string
+          nullable: true
+        avatar:
+          type: string
+          examples:
+            - https://site.com/static/qwertyui.jpg
+          nullable: true
+        teacher_classroom_id: *ref_0
+        schools:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserSchoolCreate'
+          nullable: true
+        classrooms:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserClassroomCreate'
+          nullable: true
+        parent_ids:
+          type: array
+          items: *ref_0
+        child_ids:
+          type: array
+          items: *ref_0
+        passport_number:
+          type: string
+          examples:
+            - I-AS 603710
+        birth_cert_number:
+          type: string
+        work_title:
+          type: string
+        work_place:
+          type: string
+        district:
+          type: string
+        reference:
+          type: string
+          nullable: true
+        nickname:
+          type: string
+          nullable: true
+        education_title:
+          type: string
+          nullable: true
+        education_place:
+          type: string
+          nullable: true
+        education_group:
+          type: string
+          nullable: true
+      type: object
+    UserProfileEdit:
+      properties:
+        first_name:
+          type: string
+          examples:
+            - Aman
+        middle_name:
+          type: string
+          examples:
+            - Meredovich
+        last_name:
+          type: string
+          examples:
+            - Myradov
+        birthday: *ref_42
+        gender: *ref_41
+        address:
+          type: string
+        avatar:
+          type: string
+          examples:
+            - https://site.com/static/qwertyui.jpg
+      type: object
+    UserPassword:
+      properties:
+        old_password:
+          type: string
+        new_password:
+          type: string
+      type: object
+    DashboardSubjectPercent:
+      properties:
+        subject_id: *ref_0
+        classroom_id: *ref_0
+        subject_name:
+          type: string
+          examples:
+            - Yazuw
+        classroom_name:
+          type: string
+          examples:
+            - 1A
+        is_grades_full:
+          type: boolean
+        grades_full_percent:
+          type: integer
+        students_count:
+          type: integer
+        lessons_count:
+          type: integer
+        grades_count:
+          type: integer
+        absents_count:
+          type: integer
+      type: object
+    AdminDashboard:
+      properties:
+        organization_count:
+          type: integer
+        schools_count:
+          type: integer
+        principals_count:
+          type: integer
+        teachers_count:
+          type: integer
+        students_count:
+          type: integer
+        parents_count:
+          type: integer
+        by_school:
+          type: array
+          properties:
+            school:
+              type: object
+              properties: {}
+            subject_percent:
+              properties:
+                students_count:
+                  type: integer
+                lesson_title:
+                  type: string
+                assignment_title:
+                  type: string
+                lessons_count:
+                  type: integer
+                topics_count:
+                  type: integer
+                grades_count:
+                  type: integer
+                absents_count:
+                  type: integer
+                absent_percent:
+                  type: integer
+                grade_full_percent:
+                  type: integer
+                is_grade_full:
+                  type: integer
+              type: object
+          items:
+            type: string
+      type: object
+    PrincipalDashboard:
+      properties:
+        teachers_count:
+          type: integer
+        students_count:
+          type: integer
+        parents_count:
+          type: integer
+        principals_count:
+          type: integer
+        current_lesson_date: *ref_42
+        current_lesson_times:
+          type: array
+          items:
+            $ref: '#/components/schemas/Time'
+        current_lesson_number:
+          type: integer
+        current_lesson_subjects:
+          type: integer
+        by_teacher:
+          type: array
+          properties:
+            teacher:
+              type: object
+              properties: {}
+            subject_percents:
+              type: array
+              items:
+                type: object
+                properties: {}
+          items:
+            type: string
+      type: object
+    TeacherDashboard:
+      properties:
+        subject_hours_sum:
+          type: integer
+        classroom_count:
+          type: integer
+        by_subject:
+          type: array
+          properties:
+            subject:
+              type: object
+              properties: {}
+            grades_full_percent:
+              type: integer
+            topics_full_percent:
+              type: integer
+            attendance_percent:
+              type: integer
+          items:
+            type: string
+      type: object
+    ParentDashboard:
+      properties: {}
+      type: object
+    Dashboard:
+      properties:
+        parent:
+          $ref: '#/components/schemas/ParentDashboard'
+        teacher:
+          $ref: '#/components/schemas/TeacherDashboard'
+        principal:
+          $ref: '#/components/schemas/PrincipalDashboard'
+        admin:
+          $ref: '#/components/schemas/AdminDashboard'
+      type: object
+    UserNotification:
+      properties:
+        id: *ref_0
+        notification: *ref_7
+        user_id: *ref_0
+        read_at: *ref_4
+        comment:
+          type: string
+        comment_files:
+          type: array
+          items: *ref_36
+      type: object
+    Notification:
+      properties:
+        id: *ref_0
+        school_ids:
+          type: array
+          items:
+            type: integer
+        user_ids:
+          type: array
+          items: *ref_0
+        roles:
+          type: array
+          items:
+            type: string
+        author_id: *ref_0
+        title:
+          type: string
+        content:
+          type: string
+        files:
+          type: array
+          items: *ref_36
+        updated_at: *ref_4
+        created_at: *ref_4
+      type: object
+    MessageCreate:
+      properties:
+        message:
+          type: string
+        files:
+          type: array
+          items: *ref_36
+        group_id: *ref_0
+        user_id: *ref_0
+        session_id: *ref_0
+      type: object
+    MessageGroup:
+      type: object
+      properties:
+        id: *ref_0
+        admin_id: *ref_0
+        title:
+          type: string
+        description:
+          type: string
+        school_id: *ref_0
+        classroom_id: *ref_0
+        unread_count:
+          type: integer
+    Message:
+      properties:
+        id: *ref_0
+        message:
+          type: string
+        files:
+          type: array
+          items: *ref_36
+        created_at: *ref_4
+        read_at: *ref_4
+        group_id: *ref_0
+        user_id: *ref_0
+        session_id: *ref_0
+      type: object
+    AppPermission:
+      type: string
+      examples:
+        - tool_logs
+    AppSettingsPages:
+      allOf:
+        - type: object
+          properties:
+            privacy:
+              properties:
+                content:
+                  type: string
+                title:
+                  type: string
+              type: object
+            rules:
+              properties:
+                content:
+                  type: string
+                title:
+                  type: string
+              type: object
+    AppSettingsSubject:
+      allOf:
+        - &ref_44
+          $ref: '#/components/schemas/SubjectSettings'
+    AppSettingsContact:
+      allOf:
+        - type: object
+          properties:
+            contact_messages:
+              type: array
+              items:
+                properties:
+                  suggestions:
+                    type: array
+                    items:
+                      type: string
+                    examples:
+                      - - Tema awtomat dolduryan gerek LANG
+                        - Gowy bolupdyr
+                  complaints:
+                    type: array
+                    items:
+                      type: string
+                  reviews:
+                    type: array
+                    items:
+                      type: string
+                type: object
+            contact_videos:
+              type: array
+              items:
+                properties:
+                  title:
+                    type: string
+                  file: *ref_36
+                type: object
+    AppSettings:
+      allOf:
+        - type: object
+          properties:
+            app_version:
+              type: string
+              examples:
+                - v1.0
+            login_alert:
+              type: string
+              default: null
+              nullable: true
+            menu_add:
+              type: array
+              items:
+                type: array
+                items:
+                  type: string
+                examples:
+                  - - - Library
+                      - https://kitaphana.edu.tm
+                      - null
+                    - - Server availability
+                      - https://up.mekdep.org/status/main
+                      - null
+            holidays:
+              type: array
+              items:
+                type: object
+                properties:
+                  start_date: *ref_4
+                  end_date: *ref_4
+                  name:
+                    type: string
+            bank_types:
+              type: array
+              items:
+                type: string
+                examples:
+                  - - halkbank
+                    - rysgalbank
+                    - senagatbank
+                    - tfeb
+            grade_reasons:
+              type: array
+              items:
+                type: object
+                properties:
+                  name:
+                    type: object
+                    properties:
+                      en:
+                        type: string
+                      ru:
+                        type: string
+                      tm:
+                        type: string
+                    examples:
+                      - en: Excused
+                        ru: Уважительная причина
+                        tm: Sebäpli
+                  code:
+                    type: string
+              examples:
+                - - name:
+                      en: Excused
+                      ru: Уважительная причина
+                      tm: Sebäpli
+                    code: 'yes'
+                  - name:
+                      en: Not excused
+                      ru: Не уважительная причина
+                      tm: Sebäpsiz
+                    code: 'no'
+                  - name:
+                      en: Ill
+                      ru: Болеет
+                      tm: Ýarawsyz
+                    code: ill
+            lesson_types:
+              type: array
+              items:
+                type: object
+                properties:
+                  name:
+                    type: object
+                    properties:
+                      en:
+                        type: string
+                      ru:
+                        type: string
+                      tm:
+                        type: string
+                    examples:
+                      - en: Täze maglumatlary öwretmek sapagy
+                        ru: Урок изучения нового материала
+                        tm: Täze maglumatlary öwretmek sapagy
+                  code:
+                    type: string
+              examples:
+                - - name:
+                      en: Täze maglumatlary öwretmek sapagy
+                      ru: Урок изучения нового материала
+                      tm: Täze maglumatlary öwretmek sapagy
+                    code: new_topic
+            period:
+              type: object
+              properties:
+                current_number:
+                  type: integer
+                  examples:
+                    - 4
+                value:
+                  type: array
+                  items:
+                    type: string
+                    format: date-time
+                  examples:
+                    - - - '2023-09-01'
+                        - '2023-10-22'
+                      - - '2023-10-31'
+                        - '2023-12-29'
+            states:
+              type: array
+              items:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  url:
+                    type: string
+                  code:
+                    type: string
+              examples:
+                - - name: Aşgabat
+                    url: https://mekdep.edu.tm
+                    code: ag
+            student_comments:
+              type: array
+              items:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  types:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+                        comments:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              en:
+                                type: string
+                              ru:
+                                type: string
+                              tm:
+                                type: string
+              examples:
+                - - name: Bilim
+                    types:
+                      - type: Gowy
+                        comments:
+                          - en: Çagaňyz okuwdan başarjaň! Tüweleme!
+                            ru: Çagaňyz okuwdan başarjaň! Tüweleme!
+                            tm: Çagaňyz okuwdan başarjaň! Tüweleme!
+        - *ref_43
+        - *ref_44
+        - $ref: '#/components/schemas/LessonSettings'
+        - $ref: '#/components/schemas/AppSettingsPayments'
+    LessonSettings:
+      properties:
+        lesson:
+          properties:
+            grade_reasons:
+              type: object
+              properties:
+                name:
+                  type: string
+                code:
+                  type: string
+              examples:
+                - - name: Sebäpli
+                    code: 'yes'
+                  - name: Sebäpsiz
+                    code: 'no'
+                  - name: Ýarawsyz
+                    code: ill
+            lesson_types:
+              type: object
+              properties:
+                name:
+                  type: string
+                code:
+                  type: string
+              examples:
+                - - name: Täze maglumatlary öwretmek sapagy
+                    code: new_topic
+                  - name: Bilimleri, başarnyklary we endikleri berkitmek sapagy.
+                    code: skills
+                  - name: Bilimleri barlamak we bahalandyrmak sapagy.
+                    code: test
+                  - name: Gaýtalamak sapagy
+                    code: repeat
+                  - name: Leksiýa sapagy
+                    code: lecture
+                  - name: Amaly-tejribe sapagy
+                    code: practice
+                  - name: Garyşyk sapagy
+                    code: mix
+                  - name: Ýazuw-barlag işi sapagy
+                    code: exam
+                  - name: Düzme-Beýannama sapagy
+                    code: essay
+            student_comments:
+              type: object
+              properties:
+                name:
+                  type: string
+                  examples:
+                    - Bilim
+                types:
+                  type: array
+                  properties:
+                    type:
+                      type: string
+                      examples:
+                        - Gowy
+                    comments:
+                      type: array
+                      items:
+                        type: string
+                      examples:
+                        - - Çagaňyz okuwdan başarjaň! Tüweleme!
+                          - Çagaňyz okuwdan ýetişenok! Üns bermeli!
+                  items:
+                    type: string
+          type: object
+      type: object
+    SubjectSettings:
+      properties:
+        topic_subjects:
+          type: array
+          items:
+            type: object
+            properties:
+              code:
+                type: string
+              name:
+                type: string
+              full_name:
+                type: string
+        topic_tags:
+          type: array
+          items:
+            type: string
+          examples:
+            - - Takyk
+              - Ynsanperwer
+              - Tebigy
+              - Hünär
+        subjects:
+          type: array
+          items:
+            type: object
+            properties:
+              code:
+                type: string
+              name:
+                type: string
+              full_name:
+                type: string
+        sub_group_keys:
+          type: array
+          items: *ref_39
+      type: object
+    PaymentTransaction:
+      properties:
+        id: *ref_0
+        amount: *ref_35
+        original_amount: *ref_35
+        order_url:
+          type: string
+          examples:
+            - https:://tpi.gov.tm/....
+        order_number:
+          type: string
+          examples:
+            - '123'
+        months:
+          type: integer
+        status:
+          type: string
+        description:
+          type: string
+        comment:
+          type: string
+        students:
+          type: array
+          items: *ref_9
+        payer: *ref_9
+        updated_at: *ref_4
+        created_at: *ref_4
+      type: object
+    AnalyticsGradeCounts:
+      properties:
+        subject_grades:
+          type: array
+          items:
+            properties:
+              subject_id: *ref_0
+              subject_name:
+                type: string
+                examples:
+                  - Matematika
+              date: *ref_42
+              grade_value:
+                type: string
+                examples:
+                  - '5'
+            type: object
+      type: object
+    AnalyticsSubjectAreaItem:
+      properties:
+        title:
+          type: string
+          examples:
+            - Takyk
+        percent:
+          type: integer
+          examples:
+            - 20
+        percent_prev:
+          type: integer
+          examples:
+            - 20
+        point:
+          type: integer
+          examples:
+            - 20
+        point_prev:
+          type: integer
+          examples:
+            - 20
+        by_subject:
+          type: array
+          items:
+            type: object
+            properties:
+              subject_id: *ref_0
+              name:
+                type: string
+                examples:
+                  - Matematika
+              lessons_count:
+                type: integer
+                examples:
+                  - 9
+              grades_count:
+                type: integer
+                examples:
+                  - 9
+              point:
+                type: integer
+                examples:
+                  - 20
+              point_prev:
+                type: integer
+                examples:
+                  - 20
+      type: object
+    AnalyticsSubjectRating:
+      properties:
+        subject_rating:
+          type: object
+          properties:
+            by_subject:
+              type: object
+              properties:
+                subject_id: *ref_0
+                name:
+                  type: string
+                  examples:
+                    - Matematika
+                lessons_count:
+                  type: integer
+                  examples:
+                    - 9
+                grades_count:
+                  type: integer
+                  examples:
+                    - 9
+                point:
+                  type: integer
+                  examples:
+                    - 20
+                point_prev:
+                  type: integer
+                  examples:
+                    - 20
+                rating:
+                  type: integer
+                  examples:
+                    - 2
+                rating_prev:
+                  type: integer
+                  examples:
+                    - 2
+            rating:
+              type: integer
+              examples:
+                - 2
+            rating_prev:
+              type: integer
+              examples:
+                - 2
+      type: object
+    AnalyticsStreak:
+      properties:
+        grade_strike:
+          type: integer
+          examples:
+            - 2
+      type: object
+    ReportFormOptionScheme:
+      properties:
+        title:
+          type: string
+        key:
+          type: string
+        type:
+          $ref: '#/components/schemas/ReportValueType'
+        options:
+          type: array
+          items:
+            type: string
+      type: object
+    ReportForm:
+      properties:
+        key:
+          type: string
+        value:
+          type: string
+      type: object
+    ReportRow:
+      properties:
+        region:
+          type: string
+        region_code:
+          type: string
+        school:
+          type: string
+        schools_code:
+          type: string
+        school_id:
+          type: integer
+        classroom:
+          type: string
+        classroom_id:
+          type: integer
+        user:
+          type: string
+        user_id:
+          type: integer
+        percent:
+          type: integer
+        values:
+          type: array
+          items:
+            type: string
+      type: object
+    ReportTotal:
+      properties:
+        title:
+          type: string
+        value:
+          type: string
+        type:
+          type: string
+      type: object
+    ReportData:
+      properties:
+        has_between_date:
+          type: boolean
+          examples:
+            - false
+        has_detail:
+          type: boolean
+          examples:
+            - false
+        has_period_number:
+          type: boolean
+          examples:
+            - false
+        headers:
+          type: array
+          items:
+            type: string
+        rows:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReportRow'
+        totals:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReportTotal'
+      type: object
+    UserLog:
+      properties:
+        id: *ref_0
+        school: &ref_50
+          $ref: '#/components/schemas/SchoolList'
+        user: *ref_9
+        session: *ref_45
+        subject_id: *ref_0
+        subject_name: *ref_46
+        subject_action: *ref_47
+        properties:
+          type: object
+          properties: {}
+        subject:
+          type: object
+          properties: {}
+        created_at: *ref_4
+      type: object
+    ContactItemList:
+      allOf:
+        - *ref_18
+        - properties:
+            user:
+              type: object
+              default: null
+              properties: {}
+              nullable: true
+            school:
+              type: object
+              default: null
+              properties: {}
+              nullable: true
+          type: object
+    ContactItem:
+      properties:
+        id: *ref_0
+        related_ids:
+          type: array
+          items: *ref_0
+        message:
+          type: string
+        type: *ref_48
+        status: *ref_49
+        files:
+          type: array
+          items: *ref_36
+        user: *ref_9
+        school: *ref_50
+      type: object
+    UserClassroom:
+      properties:
+        classroom_id: *ref_0
+        user_id: *ref_0
+        type: *ref_39
+        type_key:
+          type: integer
+          examples:
+            - 1
+      type: object
+    UserSchool:
+      properties:
+        role_code: *ref_1
+        school: *ref_50
+      type: object
+    SchoolList:
+      properties:
+        id: *ref_0
+        code:
+          type: string
+          examples:
+            - ag1
+        name:
+          type: string
+          examples:
+            - 1-nji orta mekdep
+        full_name:
+          type: string
+          examples:
+            - Ýöriteleşdirilen 1-nji orta mekdep
+        description:
+          type: string
+        avatar: &ref_51
+          $ref: '#/components/schemas/Image'
+        background: *ref_51
+        phone:
+          type: string
+        email:
+          type: string
+        address:
+          type: string
+        created_at: *ref_4
+        updated_at: *ref_4
+        archived_at: *ref_4
+      type: object
+    School:
+      properties:
+        id: *ref_0
+        code:
+          type: string
+          examples:
+            - ag1
+        name:
+          type: string
+          examples:
+            - 1-nji orta mekdep
+        full_name:
+          type: string
+          examples:
+            - Ýöriteleşdirilen 1-nji orta mekdep
+        description:
+          type: string
+        avatar: *ref_51
+        background: *ref_51
+        phone:
+          type: string
+        email:
+          type: string
+        address:
+          type: string
+        admin: *ref_9
+        parent: *ref_50
+        created_at: *ref_4
+        updated_at: *ref_4
+        archived_at: *ref_4
+        parent_id:
+          type: integer
+        is_secondary_school:
+          type: boolean
+      type: object
+    Period:
+      properties:
+        id: *ref_0
+        title:
+          type: string
+          examples:
+            - 2022/23
+        value:
+          type: object
+          examples:
+            - - - '2023-09-01'
+                - '2023-10-22'
+              - - '2023-10-31'
+                - '2023-12-29'
+              - - '2024-01-12'
+                - '2024-03-19'
+              - - '2024-03-29'
+                - '2024-05-25'
+          properties: {}
+        is_enabled:
+          type: boolean
+        timetable_count:
+          type: integer
+        subject_count:
+          type: integer
+        school: *ref_50
+      type: object
+    ShiftList:
+      properties:
+        id: *ref_0
+        name:
+          type: string
+          examples:
+            - 08:30/14:00 irdenki
+        value:
+          type: object
+          examples:
+            - - - - '08:30'
+                  - '09:15'
+                - - '09:20'
+                  - '10:05'
+                - - '10:10'
+                  - '10:55'
+                - - '11:10'
+                  - '11:55'
+              - null
+              - - - '08:30'
+                  - '09:15'
+                - - '09:20'
+                  - '10:05'
+                - - '10:10'
+                  - '10:55'
+                - - '11:10'
+                  - '11:55'
+              - null
+              - - - '08:30'
+                  - '09:15'
+                - - '09:20'
+                  - '10:05'
+                - - '10:10'
+                  - '10:55'
+                - - '11:10'
+                  - '11:55'
+              - null
+          properties: {}
+        created_at: *ref_4
+        updated_at: *ref_4
+      type: object
+    Shift:
+      properties:
+        id: *ref_0
+        name:
+          type: string
+          examples:
+            - 08:30/14:00 irdenki
+        value:
+          type: object
+          examples:
+            - - - - '08:30'
+                  - '09:15'
+                - - '09:20'
+                  - '10:05'
+                - - '10:10'
+                  - '10:55'
+                - - '11:10'
+                  - '11:55'
+              - null
+              - - - '08:30'
+                  - '09:15'
+                - - '09:20'
+                  - '10:05'
+                - - '10:10'
+                  - '10:55'
+                - - '11:10'
+                  - '11:55'
+              - null
+              - - - '08:30'
+                  - '09:15'
+                - - '09:20'
+                  - '10:05'
+                - - '10:10'
+                  - '10:55'
+                - - '11:10'
+                  - '11:55'
+              - null
+          properties: {}
+        timetables_count:
+          type: integer
+        school: *ref_50
+        updated_by: *ref_9
+        created_at: *ref_4
+        updated_at: *ref_4
+      type: object
+    TimetableList: *ref_27
+    Timetable:
+      properties:
+        id: *ref_0
+        value:
+          type: object
+          examples:
+            - - - 12
+                - 13
+                - 14
+              - null
+              - - 12
+                - null
+                - 22
+                - 23
+                - 23
+              - null
+              - - 1
+                - 2
+                - 3
+              - null
+          properties: {}
+        shift: *ref_29
+        classroom: *ref_20
+        school: *ref_14
+        updated_by: *ref_2
+        created_at: *ref_4
+        updated_at: *ref_4
+      type: object
+    ParentSubjects:
+      properties:
+        period_counts:
+          type: array
+          items:
+            properties:
+              period_key:
+                type: integer
+              lessons_count:
+                type: integer
+              absents_yes_count:
+                type: integer
+              absents_no_count:
+                type: integer
+              absents_ill_count:
+                type: integer
+            type: object
+        subjects:
+          type: array
+          items:
+            properties:
+              subject: *ref_25
+              period_grades:
+                type: object
+                properties:
+                  '1': &ref_52
+                    $ref: '#/components/schemas/PeriodGrade'
+              exam_grade: *ref_52
+              final_grade: *ref_52
+            type: object
+      type: object
+    ParentChildren:
+      properties:
+        children:
+          type: array
+          items:
+            properties:
+              user: *ref_9
+              school: *ref_50
+              classroom: *ref_53
+            type: object
+      type: object
+    TeacherTimetable:
+      properties:
+        week:
+          type: array
+          items:
+            type: array
+            items:
+              properties:
+                date: *ref_42
+                shift_times:
+                  type: array
+                  items:
+                    type: string
+                  examples:
+                    - - '08:30'
+                      - '09:15'
+                subject: *ref_54
+                subject_percent:
+                  $ref: '#/components/schemas/DashboardSubjectPercent'
+              type: object
+      type: object
+    DiaryItem:
+      properties:
+        subject: *ref_54
+        shift_times:
+          type: array
+          items:
+            type: string
+          examples:
+            - - '08:30'
+              - '09:15'
+        lesson: *ref_55
+        grade: *ref_10
+        absent: *ref_56
+      type: object
+    DiaryDay:
+      properties:
+        holiday:
+          type: string
+          examples:
+            - Täze ýylyňyz gutly bolsun!
+          nullable: true
+        date: *ref_42
+        hours:
+          items: null
+          $ref: '#/components/schemas/DiaryItem'
+      type: object
+    Diary:
+      properties:
+        last_checked: *ref_4
+        days:
+          type: array
+          items:
+            $ref: '#/components/schemas/DiaryDay'
+      type: object
+    Journal:
+      properties:
+        students:
+          type: array
+          items: *ref_9
+        period_grades:
+          type: array
+          items: *ref_52
+        student_notes:
+          type: array
+          items:
+            $ref: '#/components/schemas/StudentNote'
+        lessons:
+          type: array
+          items:
+            properties:
+              lesson: *ref_55
+              grades:
+                type: array
+                items: *ref_10
+              absents:
+                type: array
+                items: *ref_56
+            type: object
+      type: object
+    Assignment:
+      properties:
+        id: *ref_0
+        content:
+          type: string
+          examples:
+            - Homework Big Text...
+        created_at: *ref_4
+        updated_at: *ref_4
+      type: object
+    StudentNote:
+      properties:
+        id: *ref_0
+        note:
+          type: string
+          examples:
+            - qwertyui
+        student_id: *ref_0
+        created_at: *ref_4
+        updated_at: *ref_4
+      type: object
+    Absent:
+      properties:
+        id: *ref_0
+        reason:
+          type: string
+          examples:
+            - qwertyui
+        lesson_id:
+          type: string
+          examples:
+            - qwertyui
+        comment:
+          type: string
+          examples:
+            - qwertyui
+        created_at: *ref_4
+        updated_at: *ref_4
+      type: object
+    PeriodGrade:
+      properties:
+        period_id: *ref_0
+        period_key: *ref_0
+        student_id: *ref_0
+        grade_value:
+          type: string
+          examples:
+            - '4.5'
+        updated_at: *ref_4
+      type: object
+    Grade:
+      properties:
+        id: *ref_0
+        value:
+          type: integer
+          examples:
+            - 5
+        values:
+          type: array
+          items:
+            type: integer
+          examples:
+            - - 5
+              - 2
+        comment:
+          type: string
+          examples:
+            - qwertyui
+        lesson_id:
+          type: string
+          examples:
+            - qwertyui
+        created_at: *ref_4
+        updated_at: *ref_4
+      type: object
+    Lesson:
+      properties:
+        id: *ref_0
+        title:
+          type: string
+          examples:
+            - Tema1
+        content:
+          type: string
+          examples:
+            - Tema Big Text...
+        date:
+          type: string
+          examples:
+            - '2023-10-18'
+        hour_number:
+          type: integer
+          examples:
+            - 1
+        assignment:
+          $ref: '#/components/schemas/Assignment'
+      type: object
+    SubjectList: *ref_25
+    SubjectExam:
+      properties:
+        id: *ref_0
+        subject: *ref_25
+        classroom: *ref_20
+        teacher: *ref_9
+        head_teacher: *ref_9
+        member_teachers:
+          type: array
+          items: *ref_9
+        school: *ref_14
+        start_time: *ref_4
+        time_length_min:
+          type: integer
+        room_number:
+          type: string
+        created_at: *ref_4
+        updated_at: *ref_4
+      type: object
+    Subject:
+      properties:
+        id: *ref_0
+        name:
+          type: string
+          examples:
+            - Matematika
+        full_name:
+          type: string
+          examples:
+            - Matematika baslangyc
+        week_hours:
+          type: integer
+          examples:
+            - 5
+        classroom_type: *ref_39
+        classroom_type_key:
+          type: integer
+          examples:
+            - 1
+        classroom: *ref_53
+        teacher: *ref_9
+        second_teacher: *ref_9
+        school: *ref_50
+        exam: *ref_22
+      type: object
+    CreateSubject:
+      properties:
+        title:
+          type: string
+        category:
+          type: string
+        price:
+          type: integer
+        exam_min_grade:
+          type: string
+        age_category:
+          type: string
+        is_available:
+          type: boolean
+      type: object
+    BaseSubject:
+      properties:
+        title:
+          type: string
+        category:
+          type: string
+        price: *ref_35
+        exam_min_grade:
+          type: string
+        age_category:
+          type: string
+        is_available:
+          type: boolean
+      type: object
+      required:
+        - is_available
+        - title
+    TopicList:
+      $ref: '#/components/schemas/Topic'
+    Topic:
+      properties:
+        id: *ref_0
+        subject:
+          type: string
+          examples:
+            - Matematika
+        classroom:
+          type: string
+          examples:
+            - 1
+        level:
+          type: string
+          examples:
+            - Adaty
+        period:
+          type: string
+          examples:
+            - 1
+        tags:
+          type: array
+          items:
+            type: string
+            examples:
+              - takyk
+        title:
+          type: string
+          examples:
+            - 1
+        content:
+          type: string
+          examples:
+            - 1
+        files:
+          type: array
+          items: *ref_36
+        relation_ids:
+          type: array
+          items: *ref_0
+      type: object
+    ClassroomList: *ref_20
+    Classroom:
+      properties:
+        id: *ref_0
+        name:
+          type: string
+          examples:
+            - 11A
+        students_count:
+          type: integer
+        students:
+          type: array
+          items: *ref_9
+        subjects:
+          type: array
+          items: *ref_54
+        teacher: *ref_9
+        student: *ref_9
+        school: *ref_50
+        archived_at:
+          type: string
+          examples:
+            - '2022-01-01 12:12:00'
+        sub_groups:
+          type: array
+          items:
+            properties:
+              type: *ref_39
+              type_key:
+                type: integer
+                examples:
+                  - 1
+              student_ids:
+                type: array
+                items: *ref_0
+            type: object
+      type: object
+    Session:
+      properties:
+        id: *ref_0
+        user_id: *ref_0
+        agent:
+          type: string
+          examples:
+            - >-
+              Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like
+              Gecko) Chrome/104.0.5112.81 Safari/537.36
+        ip:
+          type: string
+          examples:
+            - 12.13.14.15
+        os:
+          type: string
+          examples:
+            - Linux
+        browser:
+          type: string
+          examples:
+            - Chrome
+        iat: *ref_4
+        lat: *ref_4
+      type: object
+    UserList:
+      properties:
+        id: *ref_0
+        first_name:
+          type: string
+          examples:
+            - Aman
+        last_name:
+          type: string
+          examples:
+            - Myradov
+        middle_name:
+          type: string
+          examples:
+            - Meredovich
+        username:
+          type: string
+          examples:
+            - azcm00011
+        status: *ref_40
+        phone:
+          type: string
+          examples:
+            - '62712204'
+        email:
+          type: string
+          examples:
+            - mekdep.edu@gmail.com
+        phone_verified_at: *ref_4
+        email_verified_at: *ref_4
+        birthday: *ref_42
+        gender: *ref_41
+        address:
+          type: string
+        avatar: *ref_51
+        last_online_at: *ref_4
+        is_online:
+          type: boolean
+      type: object
+    User:
+      properties:
+        id: *ref_0
+        first_name:
+          type: string
+          examples:
+            - Aman
+        last_name:
+          type: string
+          examples:
+            - Myradov
+        middle_name:
+          type: string
+          examples:
+            - Meredovich
+        username:
+          type: string
+          examples:
+            - azcm00011
+        status: *ref_40
+        phone:
+          type: string
+          examples:
+            - '62712204'
+        email:
+          type: string
+          examples:
+            - mekdep.edu@gmail.com
+        phone_verified_at: *ref_4
+        email_verified_at: *ref_4
+        birthday: *ref_42
+        gender: *ref_41
+        address:
+          type: string
+        avatar: *ref_51
+        classroom: *ref_20
+        parents:
+          type: array
+          items: *ref_9
+        children:
+          type: array
+          items: *ref_9
+        schools:
+          type: array
+          items: *ref_57
+        passport_number:
+          type: string
+          examples:
+            - I-AS 603710
+        birth_cert_number:
+          type: string
+        work_title:
+          type: string
+        work_place:
+          type: string
+        district:
+          type: string
+        reference:
+          type: string
+        nickname:
+          type: string
+        education_title:
+          type: string
+        education_place:
+          type: string
+        education_group:
+          type: string
+      type: object
+    LessonLikesRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: uint
+        user_id:
+          type: integer
+          format: uint
+        lesson_id:
+          type: integer
+          format: uint
+    ContactItemStatus:
+      type: string
+      enum:
+        - waiting
+        - todo
+        - processing
+        - done
+        - backlog
+        - rejected
+    ContactItemType:
+      type: string
+      enum:
+        - review
+        - complaint
+        - suggestion
+        - data_complaint
+    ReportValueType:
+      type: string
+      enum:
+        - number
+        - text
+        - textarea
+        - boolean
+        - option
+    UserLogAction:
+      type: string
+      enum:
+        - create
+        - update
+        - delete
+        - login
+        - logout
+        - update_password
+        - update_profile
+    UserLogSubject:
+      type: string
+      enum:
+        - users
+        - schools
+        - classrooms
+        - absents
+        - lessons
+        - grades
+        - timetables
+        - subjects
+        - shifts
+        - periods
+    Gender:
+      description: 1 = male, 2 = female
+      type: integer
+      enum:
+        - 1
+        - 2
+      examples:
+        - 1
+    AuthType:
+      type: string
+      enum:
+        - password
+        - 2fa-sms
+      examples:
+        - password
+    Phone:
+      type: string
+      examples:
+        - '62919293'
+    AccountStatus:
+      type: string
+      enum:
+        - free
+        - plus
+        - unlimited
+    Status:
+      type: string
+      enum:
+        - wait
+        - active
+        - blocked
+      examples:
+        - active
+    ClassroomType:
+      type: string
+      enum:
+        - lang1
+        - lang2
+        - labor1
+        - computer1
+        - lang3
+        - lang4
+        - lang5
+        - other1
+        - null
+    RoleCode:
+      type: string
+      enum:
+        - student
+        - teacher
+        - parent
+        - principal
+        - organization
+        - admin
+      examples:
+        - student
+    Money:
+      type: string
+      description: 4 manat 50 tenne
+      examples:
+        - '450'
+    FileDelete:
+      description: File from storage
+      type: string
+      examples:
+        - files/file.pdf
+    File:
+      description: File from storage
+      type: string
+      examples:
+        - https://storage.emekdep.com/files/file.pdf
+    Image:
+      description: Image from storage
+      type: string
+      examples:
+        - https://storage.emekdep.com/images/qwertyui.jpg
+    Time:
+      description: Time format
+      type: string
+      examples:
+        - '08:30'
+    Date:
+      description: Date format
+      type: string
+      examples:
+        - '2023-01-09'
+    DateTime:
+      description: DateTime ISO format
+      type: string
+      examples:
+        - '2023-01-09T11:07:08.000000Z'
+    Id:
+      type: integer
+      examples:
+        - 1
+  securitySchemes: {}
+servers: []

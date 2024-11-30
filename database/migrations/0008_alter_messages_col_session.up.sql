@@ -1,0 +1,1 @@
+alter table sessions alter COLUMN token type text;

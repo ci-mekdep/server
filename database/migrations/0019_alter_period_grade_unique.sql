@@ -1,0 +1,1 @@
+ALTER TABLE period_grades ADD exam_id bigint DEFAULT NULL REFERENCES subject_exams ON DELETE CASCADE;

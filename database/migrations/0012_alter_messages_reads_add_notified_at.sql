@@ -1,0 +1,1 @@
+ALTER TABLE messages_reads ADD notified_at timestamp DEFAULT NULL;

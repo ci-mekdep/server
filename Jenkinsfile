@@ -104,16 +104,21 @@ pipeline {
                     switch(env.BRANCH_NAME) {
                         case "dev":
                             sshagent(credentials: ['sohbet_jenkins']) {
+                                echo 'Stoppign app monitoring service'
                                 sh "supervisorctl stop monitor_api"
                             }
                         case "stable":
                             sshagent(credentials: ['sohbet_jenkins']) {
+                                echo 'Stoppign app monitoring service'
                                 sh "ssh -p 9021 sohbet@192.168.1.101 'supervisorctl stop monitor_api'"
+                                echo 'Stopping reverse_proxy monitoring Service'
                                 sh "ssh -p 9021 sohbet@192.168.1.110 'supervisorctl stop monitor-api'"
                             }
                         case "main":
                             sshagent(credentials: ['sohbet_jenkins']) {
+                                echo 'Stoppign app monitoring service'
                                 sh "ssh -p 9021 sohbet@192.168.1.101 'supervisorctl stop monitor_api'"
+                                echo 'Stopping reverse_proxy monitoring Service'
                                 sh "ssh -p 9021 sohbet@192.168.1.110 'supervisorctl stop monitor-api'"
                             }
                         }

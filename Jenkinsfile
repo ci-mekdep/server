@@ -92,7 +92,7 @@ pipeline {
         stage("Build"){
             steps{
                 script {
-                    sh "go build ."
+                    sh "PATH=$PATH:/usr/local/go/bin go build ."
                 }
                 
             }
@@ -104,21 +104,16 @@ pipeline {
                     switch(env.BRANCH_NAME) {
                         case "dev":
                             sshagent(credentials: ['sohbet_jenkins']) {
-                                echo 'Stoppign app monitoring service'
                                 sh "supervisorctl stop monitor_api"
                             }
                         case "stable":
                             sshagent(credentials: ['sohbet_jenkins']) {
-                                echo 'Stoppign app monitoring service'
                                 sh "ssh -p 9021 sohbet@192.168.1.101 'supervisorctl stop monitor_api'"
-                                echo 'Stopping reverse_proxy monitoring Service'
                                 sh "ssh -p 9021 sohbet@192.168.1.110 'supervisorctl stop monitor-api'"
                             }
                         case "main":
                             sshagent(credentials: ['sohbet_jenkins']) {
-                                echo 'Stoppign app monitoring service'
                                 sh "ssh -p 9021 sohbet@192.168.1.101 'supervisorctl stop monitor_api'"
-                                echo 'Stopping reverse_proxy monitoring Service'
                                 sh "ssh -p 9021 sohbet@192.168.1.110 'supervisorctl stop monitor-api'"
                             }
                         }
@@ -131,11 +126,11 @@ pipeline {
                     if (env.BRANCH_NAME == 'stable') {
                         // Define region-specific database hosts and names
                         def regionDBConfig = [
-                            'ahal'   : [dbHost: '192.168.1.102', dbName: 'ahal_db', APP_DIR: '/var/www/regions/ahal/server'],
-                            'mary'   : [dbHost: '192.168.1.106', dbName: 'mary_db', APP_DIR: '/var/www/regions/mary/server'],
-                            'balkan'   : [dbHost: '192.168.1.107', dbName: 'balkan_db', APP_DIR: '/var/www/regions/balkan/server'],
-                            'lebap'   : [dbHost: '192.168.1.108', dbName: 'lebap_db', APP_DIR: '/var/www/regions/lebap/server'],
-                            'dashoguz'   : [dbHost: '192.168.1.105', dbName: 'dashoguz_db', APP_DIR: '/var/www/regions/dashoguz/server']
+                            'ahal'   : [dbHost: '95.85.126.102', dbName: 'ahal_db', APP_DIR: '/var/www/regions/ahal/server'],
+                            'mary'   : [dbHost: '95.85.126.106', dbName: 'mary_db', APP_DIR: '/var/www/regions/mary/server'],
+                            'balkan'   : [dbHost: '95.85.126.107', dbName: 'balkan_db', APP_DIR: '/var/www/regions/balkan/server'],
+                            'lebap'   : [dbHost: '95.85.126.108', dbName: 'lebap_db', APP_DIR: '/var/www/regions/lebap/server'],
+                            'dashoguz'   : [dbHost: '127.0.0.1', dbName: 'dashoguz_db', APP_DIR: '/var/www/regions/dashoguz/server']
                         ]
                         
                         // Loop through each region and deploy
@@ -157,5 +152,5 @@ pipeline {
             }
         }
     }
-
+    
 }

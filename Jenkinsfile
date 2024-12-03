@@ -142,7 +142,7 @@ pipeline {
                         }
                     } else if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'main'){
                         def dbName = (env.BRANCH_NAME == 'dev') ? 'mekdep_beta' : 'mekdep_db'
-                        def dbHost = (env.BRANCH_NAME == 'dev') ? '192.168.1.107' : '192.168.1.112'
+                        def dbHost = (env.BRANCH_NAME == 'dev') ? '95.85.126.107' : '95.85.126.104'
                         def region = (env.BRANCH_NAME == 'dev') ? 'beta' : 'app'
                         DeployRegion(region, dbHost, dbName, env.BRANCH_NAME, APP_DIR)
                     }else {

@@ -108,7 +108,7 @@ pipeline {
                             }
                         case "stable":
                             sshagent(credentials: ['sohbet_jenkins']) {
-                                ssh-keyscan -p 9021 192.168.1.110 >> ~/.ssh/known_hosts
+                                sh "ssh-keyscan -p 9021 192.168.1.110 >> ~/.ssh/known_hosts"
                                 sh "ssh -p 9021 sohbet@192.168.1.101 'supervisorctl stop monitor_api'"
                                 sh "ssh -p 9021 sohbet@192.168.1.110 'supervisorctl stop monitor-api'"
                             }
